@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Chambre {
+  id Int @id @default(autoincrement())
+  hotel_id Int
+  hotel Hotel @relation(fields: [hotel_id], references: [id]) 
+  numero Int
+  categorie String
+  capacite Int
+  description String
+  disponible Boolean
+  prixNuit Int @map("prix_nuit")
+
+  reservation Reservation[]
+  
+  @@map("chambres")
+}
+
+model Hotel {
+  id Int @id @default(autoincrement())
+  nom String
+  etoile Int
+  adresse String
+  code_postal Int
+  ville String
+  telephone String
+  email String
+  gerant String
+  description String
+
+  chambre Chambre[]
+  compte Comptes[]
+
+  @@map("hotel")
+}
+
+model Comptes {
+  id Int @id @default(autoincrement())
+  role String
+  hotel_id Int?
+  hotel Hotel? @relation(fields: [hotel_id], references: [id])
+  nom String
+  prenom String
+  telephone String?
+  email String
+  motDePasse String @map("mot_de_passe")
+
+  reservation Reservation[]
+
+  @@map("comptes")
+}
+
+model Reservation {
+  id Int @id @default(autoincrement())
+  chambre_id Int
+  chambre Chambre @relation(fields: [chambre_id], references: [id])
+  compte_id Int
+  compte Comptes @relation(fields: [compte_id], references: [id])
+  date_arrivee DateTime
+  date_depart DateTime
+  nb_personnes Int
+  statut String
+  demande_speciale String?
+
+  @@map("reservation")
+}
+
+
+
