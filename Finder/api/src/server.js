@@ -10,6 +10,7 @@ import {
   SchemaInscriptionUtilisateur,
   SchemaModificationChambre,
   SchemaModificationVoyageur,
+  SchemaRechercheChambre,
 } from "./schema.js";
 
 dotenv.config({ path: path.join(import.meta.dirname, "..", ".env") });
@@ -27,10 +28,7 @@ const validerCorps = (schema) => (req, res, next) => {
   if (!resultat.success) {
     return res.status(400).json({
       erreur: "Corps de requete invalide",
-      details: resultat.error.issues.map((issue) => ({
-        champ: issue.path.join("."),
-        message: issue.message,
-      })),
+      erreurs: resultat.error.issues,
     });
   }
   req.body = resultat.data;
@@ -212,7 +210,7 @@ app.get("/hotels/:id/chambres", async (req, res, next) => {
 
   try {
     const hotel = await prisma.hotel.findUnique({ where: { id: hotelId } });
-    if (!hotel) return res.status(404).json({ erreur: "Hotel introuvable" });
+    if (!hotel) return res.status(403).json({ erreur: "Hotel introuvable" });
 
     const chambres = await prisma.chambre.findMany({
       where: { hotel_id: hotelId },
@@ -290,7 +288,7 @@ app.patch(
         where: { id, hotel_id: Number(req.user.hotelId) },
       });
       if (!chambre)
-        return res.status(404).json({ erreur: "chambre introuvable" });
+        return res.status(403).json({ erreur: "Acces refuse a cette chambre" });
 
       res.json(await prisma.chambre.update({ where: { id }, data: req.body }));
     } catch (error) {
@@ -310,7 +308,7 @@ app.delete(
         where: { id, hotel_id: Number(req.user.hotelId) },
       });
       if (!chambre)
-        return res.status(404).json({ erreur: "chambre introuvable" });
+        return res.status(403).json({ erreur: "Acces refuse a cette chambre" });
       await prisma.chambre.delete({ where: { id } });
       res.status(204).send();
     } catch (error) {
@@ -320,17 +318,25 @@ app.delete(
 );
 
 app.get("/chambres", async (req, res, next) => {
+  const resultat = SchemaRechercheChambre.safeParse(req.query);
+  if (!resultat.success) {
+    return res.status(400).json({
+      erreur: "Parametres de recherche invalides",
+      erreurs: resultat.error.issues,
+    });
+  }
+
   const { hotel_id, prix_max, capacite, categorie, date_debut, date_fin } =
-    req.query;
+    resultat.data;
   const filtre = {};
-  if (hotel_id) filtre.hotel_id = { equals: Number(hotel_id) };
-  if (prix_max) filtre.prixNuit = { lte: Number(prix_max) };
-  if (capacite) filtre.capacite = { equals: Number(capacite) };
-  if (categorie) filtre.categorie = { contains: String(categorie) };
+  if (hotel_id !== undefined) filtre.hotel_id = { equals: hotel_id };
+  if (prix_max !== undefined) filtre.prixNuit = { lte: prix_max };
+  if (capacite !== undefined) filtre.capacite = { equals: capacite };
+  if (categorie) filtre.categorie = { equals: categorie };
 
   if (date_debut && date_fin) {
-    const debut = new Date(String(date_debut));
-    const fin = new Date(String(date_fin));
+    const debut = new Date(date_debut);
+    const fin = new Date(date_fin);
     const reservations = await prisma.reservation.findMany({
       where: {
         statut: { equals: "confirmee" },
