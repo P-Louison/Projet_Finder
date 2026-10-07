@@ -11,6 +11,7 @@ import {
   SchemaModificationChambre,
   SchemaModificationVoyageur,
   SchemaRechercheChambre,
+  SchemaCreationReservation,
 } from "./schema.js";
 
 dotenv.config({ path: path.join(import.meta.dirname, "..", ".env") });
@@ -102,7 +103,7 @@ app.post(
   },
 );
 
-app.post(
+app.get(
   "/auth/login",
   validerCorps(SchemaConnexionUtilisateur),
   async (req, res, next) => {
@@ -356,25 +357,73 @@ app.get("/chambres", async (req, res, next) => {
   res.json(chambres);
 });
 
-app.get("/reservations", async (req, res, next) => {
-  try {
-    res.json(await prisma.reservation.findMany());
-  } catch (error) {
-    next(error);
-  }
-});
+app.post(
+  "/reservations",
+  authRequis,
+  exigeRole("voyageur"),
+  validerCorps(SchemaCreationReservation),
+  async (req, res, next) => {
+    const {
+      chambre_id,
+      date_arrivee,
+      date_depart,
+      nb_personne,
+      statut,
+      demande_special = "",
+    } = req.body ?? {};
 
-app.get("/reservations/:id", async (req, res, next) => {
-  const id = Number(req.params.id);
-  try {
-    const reservation = await prisma.reservation.findUnique({ where: { id } });
-    if (!reservation)
-      return res.status(404).json({ erreur: "reservation introuvable" });
-    res.json(reservation);
-  } catch (error) {
-    next(error);
-  }
-});
+    try {
+      const reservation = await prisma.reservation.create({
+        data: {
+          chambre_id: Number(chambre_id),
+          compte_id: Number(req.user.userId),
+          date_arrivee: new Date(date_arrivee),
+          date_depart: new Date(date_depart),
+          nb_personnes: Number(nb_personne),
+          statut: String(statut),
+          demande_speciale: String(demande_special),
+        },
+      });
+      res.status(201).json(reservation);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+app.get(
+  "/reservations/mine",
+  authRequis,
+  exigeRole("voyageur"),
+  async (req, res, next) => {
+    try {
+      const reservations = await prisma.reservation.findMany({
+        where: { compte_id: req.user.userId },
+        include: { chambre: true },
+      });
+      res.json(reservations);
+    } catch (error) {
+      console.error("les parametres du voyageur sont invalides : ", error);
+    }
+  },
+);
+
+app.get(
+  "/reservations/received",
+  authRequis,
+  exigeRole("hotelier"),
+  async (req, res, next) => {
+    try {
+      const reservations = await prisma.reservation.findMany({
+        where: { chambre_id: req.params.id },
+        include: { chambre: true },
+      });
+      res.json(reservations);
+    } catch (error) {
+      console.error("les parametres de l'hotelier sont invalides : ", error);
+    }
+  },
+);
 
 app.get("/comptes", async (req, res, next) => {
   try {

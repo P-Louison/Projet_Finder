@@ -35,6 +35,20 @@ export const SchemaCreationChambre = z
   })
   .strict();
 
+export const SchemaCreationReservation = z
+  .object({
+    chambre_id: z.number().int().positive("ID de la chambre invalide"),
+    date_arrivee: z.string().datetime("Date d'arrivée invalide"),
+    date_depart: z.string().datetime("Date de départ invalide"),
+    nb_personne: z.number().int().positive("Nombre de personnes invalide"),
+    statut: z.enum(["en_attente", "confirmee", "annulee"]),
+    demande_special: z
+      .string()
+      .max(200, "Demande spéciale trop longue")
+      .optional(),
+  })
+  .strict();
+
 export const SchemaModificationChambre = SchemaCreationChambre.partial()
   .strict()
   .refine((donnees) => Object.keys(donnees).length > 0, {
