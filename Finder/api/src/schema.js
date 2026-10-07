@@ -41,7 +41,7 @@ export const SchemaCreationReservation = z
     date_arrivee: z.string().datetime("Date d'arrivée invalide"),
     date_depart: z.string().datetime("Date de départ invalide"),
     nb_personne: z.number().int().positive("Nombre de personnes invalide"),
-    statut: z.enum(["en_attente", "confirmee", "annulee"]),
+    statut: z.enum(["en_attente", "confirmee", "annulee", "refusee"]),
     demande_special: z
       .string()
       .max(200, "Demande spéciale trop longue")
@@ -54,6 +54,13 @@ export const SchemaModificationChambre = SchemaCreationChambre.partial()
   .refine((donnees) => Object.keys(donnees).length > 0, {
     message: "Au moins un champ doit etre fourni",
   });
+
+export const SchemaModificationReservations =
+  SchemaCreationReservation.partial()
+    .strict()
+    .refine((donnees) => Object.keys(donnees).length > 0, {
+      message: "Au moins un champ doit etre fourni",
+    });
 
 export const SchemaModificationVoyageur = z
   .object({
