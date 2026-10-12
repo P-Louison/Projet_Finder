@@ -75,13 +75,24 @@ describe("Chambres et recherche", () => {
     expect(response.body.every((chambre) => chambre.prixNuit <= 70)).toBe(true);
   });
 
-  it("exclut les chambres déjà réservées sur les dates demandées", async () => {
-    const response = await request(app).get(
+  it("exclut puis réinclut la chambre 4 selon la période réservée du kit", async () => {
+    const periodeAvecReservation = await request(app).get(
       "/chambres?date_debut=2026-10-10&date_fin=2026-10-12",
     );
+    const periodeApresReservation = await request(app).get(
+      "/chambres?date_debut=2026-10-11&date_fin=2026-10-13",
+    );
 
-    expect(response.status).toBe(200);
-    expect(response.body.some((chambre) => chambre.id === 4)).toBe(false);
+    expect(periodeAvecReservation.status).toBe(200);
+    expect(periodeAvecReservation.body).toHaveLength(31);
+    expect(
+      periodeAvecReservation.body.some((chambre) => chambre.id === 4),
+    ).toBe(false);
+    expect(periodeApresReservation.status).toBe(200);
+    expect(periodeApresReservation.body).toHaveLength(32);
+    expect(
+      periodeApresReservation.body.some((chambre) => chambre.id === 4),
+    ).toBe(true);
   });
 
   it("crée une chambre pour l'hôtel du compte hôtelier", async () => {
