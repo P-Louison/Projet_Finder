@@ -3,7 +3,8 @@ export default {
     globals: true,
     environment: "node",
     coverage: {
-      reporter: ["text", "text-summary"],
+      include: ["src/routes/**/*.js"],
+      reporter: [["text", { skipFull: false }], "text-summary"],
     },
   },
 };
