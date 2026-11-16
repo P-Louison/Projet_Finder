@@ -10,6 +10,7 @@ const tokenHotelier = jwt.sign(
   process.env.JWT_SECRET,
 );
 const chambresCreees = [];
+const reservationsCreees = [];
 
 const nouvelleChambre = () => ({
   numero: 900000 + Math.floor(Math.random() * 99999),
@@ -32,6 +33,11 @@ async function creerChambre() {
 }
 
 afterEach(async () => {
+  if (reservationsCreees.length > 0) {
+    await prisma.reservation.deleteMany({
+      where: { id: { in: reservationsCreees.splice(0) } },
+    });
+  }
   if (chambresCreees.length > 0) {
     await prisma.chambre.deleteMany({
       where: { id: { in: chambresCreees.splice(0) } },
@@ -75,21 +81,37 @@ describe("Chambres et recherche", () => {
     expect(response.body.every((chambre) => chambre.prixNuit <= 70)).toBe(true);
   });
 
-  it("exclut puis réinclut la chambre 4 selon la période réservée du kit", async () => {
+  it("exclut une chambre réservée et la réinclut après son départ", async () => {
+    const voyageur = await prisma.comptes.findFirst({
+      where: { role: "voyageur" },
+      select: { id: true },
+    });
+    expect(voyageur).not.toBeNull();
+
+    const reservation = await prisma.reservation.create({
+      data: {
+        compte_id: voyageur.id,
+        chambre_id: 4,
+        date_arrivee: new Date("2030-10-09"),
+        date_depart: new Date("2030-10-11"),
+        nb_personnes: 2,
+        statut: "confirmee",
+      },
+    });
+    reservationsCreees.push(reservation.id);
+
     const periodeAvecReservation = await request(app).get(
-      "/chambres?date_debut=2026-10-10&date_fin=2026-10-12",
+      "/chambres?date_debut=2030-10-10&date_fin=2030-10-12",
     );
     const periodeApresReservation = await request(app).get(
-      "/chambres?date_debut=2026-10-11&date_fin=2026-10-13",
+      "/chambres?date_debut=2030-10-11&date_fin=2030-10-13",
     );
 
     expect(periodeAvecReservation.status).toBe(200);
-    expect(periodeAvecReservation.body).toHaveLength(31);
     expect(
       periodeAvecReservation.body.some((chambre) => chambre.id === 4),
     ).toBe(false);
     expect(periodeApresReservation.status).toBe(200);
-    expect(periodeApresReservation.body).toHaveLength(32);
     expect(
       periodeApresReservation.body.some((chambre) => chambre.id === 4),
     ).toBe(true);

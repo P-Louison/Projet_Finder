@@ -78,7 +78,9 @@ export const SchemaRechercheChambre = z
     hotel_id: z.coerce.number().int().positive().optional(),
     prix_max: z.coerce.number().positive("Prix maximum invalide").optional(),
     capacite: z.coerce.number().int().positive("Capacite invalide").optional(),
-    categorie: z.enum(["simple", "double", "familiale", "suite"]).optional(),
+    categorie: z
+      .enum(["simple", "double", "familiale", "suite", "studio"])
+      .optional(),
     date_debut: z.string().optional(),
     date_fin: z.string().optional(),
   })

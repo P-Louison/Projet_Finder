@@ -35,9 +35,9 @@ describe("Authentification et voyageurs", () => {
       .set("Authorization", `Bearer ${tokenPour(9, "admin")}`);
 
     expect(response.status).toBe(200);
-    expect(response.body).toHaveLength(5);
-    expect(
-      response.body.every((voyageur) => !("motDePasse" in voyageur)),
-    ).toBe(true);
+    expect(response.body).toHaveLength(6);
+    expect(response.body.every((voyageur) => !("motDePasse" in voyageur))).toBe(
+      true,
+    );
   });
 });

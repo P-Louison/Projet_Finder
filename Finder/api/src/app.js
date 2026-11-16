@@ -38,6 +38,11 @@ app.use((error, req, res, next) => {
   res.status(500).json({ erreur: "Erreur interne du serveur" });
 });
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl}`);
+  next();
+});
+
 const spec = swaggerJsdoc({
   definition: {
     openapi: "3.0.0",
@@ -57,7 +62,31 @@ const spec = swaggerJsdoc({
     path.join(import.meta.dirname, "routes", "*.js").replaceAll("\\", "/"),
   ],
 });
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(spec, {
+    swaggerOptions: {
+      tagsSorter: (tagA, tagB) => {
+        const ordre = [
+          "Système",
+          "Authentification",
+          "Voyageurs",
+          "Chambres",
+          "Hotels",
+          "Réservations",
+          "Comptes",
+        ];
+        const indexA = ordre.indexOf(tagA);
+        const indexB = ordre.indexOf(tagB);
+        return (
+          (indexA === -1 ? ordre.length : indexA) -
+          (indexB === -1 ? ordre.length : indexB)
+        );
+      },
+    },
+  }),
+);
 
 export { app, prisma, spec };
 

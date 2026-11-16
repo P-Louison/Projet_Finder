@@ -4,7 +4,15 @@
 
 Réservation de chambres d'hôtel pour le groupement Amor, Byzance, Caraïbes : une API Express, bientôt un front React.
 
-## Démarrer
+## Démarrer le front
+
+cd front
+npm install
+npm run dev
+
+Ouvrir http://localhost:5173.
+
+## Démarrer l'API
 
 cd api ; npm install
 Copy-Item .env.example .env # puis remplir PORT et DATABASE_URL

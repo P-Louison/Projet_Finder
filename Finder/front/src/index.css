@@ -1,0 +1,144 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  color: #1f2937;
+  font-family: system-ui, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.recherche-panneau {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  box-shadow: 0 8px 24px rgb(31 41 55 / 8%);
+}
+
+.recherche-titre {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+}
+
+.formulaire-recherche {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.champ-recherche {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.champ-recherche label {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.champ-recherche input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: inherit;
+}
+
+.champ-recherche input:focus-visible {
+  border-color: #2563eb;
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.bouton-recherche {
+  justify-self: start;
+  grid-column: 1 / -1;
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bouton-recherche:hover,
+.bouton-recherche:focus-visible {
+  background: #1d4ed8;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.liste-panneau,
+.detail-panneau {
+  min-width: 0;
+}
+
+.liste-chambres {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chambre-choix {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chambre-choix:hover,
+.chambre-choix:focus-visible {
+  border-color: #2563eb;
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.detail-panneau {
+  padding: 0 1.5rem;
+  border-left: 1px solid #d1d5db;
+}
+
+@media (max-width: 640px) {
+  .app {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .formulaire-recherche {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-panneau {
+    padding: 1.5rem 0 0;
+    border-top: 1px solid #d1d5db;
+    border-left: 0;
+  }
+}
