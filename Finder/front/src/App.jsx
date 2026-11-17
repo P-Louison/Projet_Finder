@@ -1,5 +1,6 @@
 import FicheChambre from "./composants/FicheChambre";
 import ErreurApi from "./composants/ErreurApi";
+import FicheHotel from "./composants/FicheHotel";
 import ListeChambres from "./composants/ListeChambres";
 import { useEffect, useState } from "react";
 
@@ -135,6 +136,10 @@ export default function App() {
     }
   }
 
+  const hotelSelectionne = hotels.find(
+    (hotelOption) => String(hotelOption.id) === criteres.hotel,
+  );
+
   if (etatApi === "erreur") {
     return (
       <ErreurApi
@@ -154,8 +159,15 @@ export default function App() {
 
   return (
     <main className="app">
-      <section>
+      <header className="app-entete">
         <h1>Chambres disponibles</h1>
+        {hotelSelectionne && (
+          <div className="fiche-hotel-panneau">
+            <FicheHotel hotel={hotelSelectionne} />
+          </div>
+        )}
+      </header>
+      <section>
         <div className="recherche-panneau">
           <h2 className="recherche-titre">Rechercher une chambre</h2>
           <form className="formulaire-recherche" onSubmit={rechercherChambres}>
@@ -261,7 +273,11 @@ export default function App() {
         ) : chargement ? (
           <p>Chargement des chambres...</p>
         ) : (
-          <ListeChambres chambres={chambres} onChoix={setSelection} />
+          <ListeChambres
+            chambres={chambres}
+            onChoix={setSelection}
+            selectionId={selection?.id}
+          />
         )}
       </section>
       <section>
