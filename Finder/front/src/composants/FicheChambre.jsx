@@ -1,7 +1,9 @@
 export default function FicheChambre({ chambre, hotel }) {
   return (
     <article>
-      <h2>{hotel.nom}</h2>
+      <h2>
+        {hotel.nom} {hotel.id}
+      </h2>
       <p>{hotel.adresse}</p>
       <p>{hotel.ville}</p>
       <hr />

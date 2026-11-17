@@ -44,7 +44,8 @@ button {
   font-weight: 600;
 }
 
-.champ-recherche input {
+.champ-recherche input,
+.champ-recherche select {
   width: 100%;
   min-width: 0;
   padding: 0.7rem 0.8rem;
@@ -54,7 +55,8 @@ button {
   color: inherit;
 }
 
-.champ-recherche input:focus-visible {
+.champ-recherche input:focus-visible,
+.champ-recherche select:focus-visible {
   border-color: #2563eb;
   outline: 2px solid #2563eb;
   outline-offset: 1px;
@@ -75,6 +77,44 @@ button {
 .bouton-recherche:hover,
 .bouton-recherche:focus-visible {
   background: #1d4ed8;
+}
+
+.page-erreur-api,
+.attente-api {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: #f3f4f6;
+}
+
+.carte-erreur-api {
+  width: min(100%, 34rem);
+  padding: 2.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(31 41 55 / 8%);
+  text-align: center;
+}
+
+.code-erreur-api {
+  margin: 0;
+  color: #2563eb;
+  font-size: clamp(5rem, 15vw, 8rem);
+  font-weight: 800;
+  line-height: 0.9;
+}
+
+.bouton-erreur-api {
+  display: block;
+  margin: 1.5rem auto 0;
+}
+
+.attente-api {
+  color: #374151;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .app {

@@ -263,7 +263,7 @@ router.get("/", async (req, res, next) => {
 
   const chambres = await prisma.chambre.findMany({
     where: filtre,
-    include: { hotel: false },
+    include: { hotel: true },
   });
   res.json(chambres);
 });
