@@ -53,5 +53,12 @@ describe("Réservations", () => {
     expect(
       response.body.every((reservation) => reservation.compte_id === 4),
     ).toBe(true);
+    expect(
+      response.body.every(
+        (reservation) =>
+          Number.isInteger(reservation.chambre.hotel.id) &&
+          typeof reservation.chambre.hotel.nom === "string",
+      ),
+    ).toBe(true);
   });
 });

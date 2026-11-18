@@ -104,7 +104,7 @@ router.post(
  *     summary: Lister mes réservations
  *     security: [{ bearerAuth: [] }]
  *     responses:
- *       '200': { description: Réservations du voyageur connecté }
+ *       '200': { description: Réservations du voyageur connecté, avec les chambres et l'identifiant et le nom de leur hôtel }
  *       '401': { description: Jeton absent ou invalide }
  *       '403': { description: Réservé aux voyageurs }
  */
@@ -116,7 +116,11 @@ router.get(
     try {
       const reservations = await prisma.reservation.findMany({
         where: { compte_id: req.user.userId },
-        include: { chambre: true },
+        include: {
+          chambre: {
+            include: { hotel: { select: { id: true, nom: true } } },
+          },
+        },
       });
       res.json(reservations);
     } catch (error) {
